@@ -1,0 +1,17 @@
+﻿0greyscreen-name|그레이스크린
+greyscreen-description|크로마키에 도움이 되게, 토글 키로 배경을 단색으로 칠합니다. GIF 녹화에 유용합니다.
+
+// Options
+Action Key|작동 키
+Choose a Key to activate GreyScreen ingame|게임 내에서 모드를 작동할 키를 선택합니다.
+Hide Foreground|배경 숨기기
+Whether hides foreground or recolours it. Read the tutorial.|배경을 숨길지 색칠할 지 선택합니다. 아래 설명을 확인하세요.
+Mask Colour|마스크 색상
+Choose a Colour for GreyScreen|모드에 사용될 색을 선택합니다.
+
+// Tutorial
+Press Action Key ingame to toggle masking.|게임 내에서 작동 키를 눌러 마스크를 켭니다.
+If Hide Foreground is checked, GreyScreen will hide terrain completely. Usually gives cleaner results.|배경 숨기기를 켜면, 배경이 완전히 숨겨집니다. 보통 더 깔끔한 결과가 나옵니다.
+If Hide Foreground is unchecked, GreyScreen will recolour terrain to the chosen colour. This allows capturing LightSources.|배경 숨기기를 끄면, 배경을 선택된 색으로 채색합니다. 배경에 비치는 빛을 찍을 수 있습니다.
+Hold Action Key to freeze screen effects. Useful for capturing multi-camera rooms, or optimised GIFs without removing scenery.|작동 키를 길게 누르면 배경 효과를 멈춥니다. 큰 방을 찍거나, 최적화된 GIF 촬영에 유용합니다.
+If the mod is in action, Pause Menu will not darken the screen.|모드가 작동 중일때는, 일시정지해도 화면이 어두워지지 않습니다.
