@@ -1,7 +1,7 @@
 {
   "id": "greyscreen",
   "name": "Greyscreen",
-  "version": "0.5.0.0",
+  "version": "1.0.0.0",
   "hide_version": false,
   "authors": "topicular",
   "description": "Enables toggling on/off a solid color background mask, to help with chroma-keying. Useful for recording gifs.",

@@ -21,7 +21,7 @@ namespace GreyScreen
     {
         public const string PLUGIN_ID = "com.rainworldgame.greyscreen.plugin";
         public const string PLUGIN_NAME = "GreyScreen";
-        public const string PLUGIN_VERSION = "0.5.0.0";
+        public const string PLUGIN_VERSION = "1.0.0.0";
 
         public void Awake()
         {
@@ -48,16 +48,15 @@ namespace GreyScreen
 
         public void Update()
         {
-            if (rw == null)
+            if (rw == null || !rw.gameObject)
             {
-                rw = UnityEngine.Object.FindObjectOfType<RainWorld>();
+                rw = FindObjectOfType<RainWorld>();
                 return;
             }
 
-            if (pm.currentMainLoop?.ID != ProcessManager.ProcessID.Game)
+            if (pm?.currentMainLoop?.ID != ProcessManager.ProcessID.Game)
             { mask = false; infos = null; freeze = false; return; }
-            RainWorldGame game = pm.currentMainLoop as RainWorldGame;
-            if (game.pauseMenu != null) { return; }
+            if (!(pm.currentMainLoop is RainWorldGame game) || game.pauseMenu != null) { return; }
 
             if (mask)
             {
@@ -91,6 +90,7 @@ namespace GreyScreen
                         for (int i = 0; i < game.cameras.Length; i++)
                         {
                             infos[i] = new CameraInfo(game.cameras[i], (Texture2D)typeof(RoomCamera).GetField("paletteTexture", flags).GetValue(game.cameras[i]));
+                            if (infos[i] == null) continue;
                             game.cameras[i].currentPalette = CameraInfo.ClonePalette(infos[i].pGrey);
                             typeof(RoomCamera).GetField("paletteTexture", flags).SetValue(game.cameras[i], infos[i].pGrey.texture);
                             game.cameras[i].ReturnFContainer("BackgroundShortcuts").isVisible = false;
