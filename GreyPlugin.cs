@@ -21,7 +21,7 @@ namespace GreyScreen
     {
         public const string PLUGIN_ID = "com.rainworldgame.greyscreen.plugin";
         public const string PLUGIN_NAME = "GreyScreen";
-        public const string PLUGIN_VERSION = "1.0.0.0";
+        public const string PLUGIN_VERSION = "1.0.0.1";
 
         public void Awake()
         {
@@ -60,7 +60,7 @@ namespace GreyScreen
 
             if (mask)
             {
-                if (!curRoom.BeingViewed) { mask = false; infos = null; }
+                if (!curRoom.BeingViewed) { mask = false; DeactivateMask(); }
             }
 
             if (Input.GetKey(activateKey.Value))
@@ -85,61 +85,71 @@ namespace GreyScreen
                     mask = !mask;
                     if (mask)
                     {
-                        Logger.LogMessage($"Apply Mask (removeFG: {(fgRemoval.Value ? "O" : "X")})");
-                        infos = new CameraInfo[game.cameras.Length];
-                        for (int i = 0; i < game.cameras.Length; i++)
-                        {
-                            infos[i] = new CameraInfo(game.cameras[i], (Texture2D)typeof(RoomCamera).GetField("paletteTexture", flags).GetValue(game.cameras[i]));
-                            if (infos[i] == null) continue;
-                            game.cameras[i].currentPalette = CameraInfo.ClonePalette(infos[i].pGrey);
-                            typeof(RoomCamera).GetField("paletteTexture", flags).SetValue(game.cameras[i], infos[i].pGrey.texture);
-                            game.cameras[i].ReturnFContainer("BackgroundShortcuts").isVisible = false;
-
-                            if (fgRemoval.Value)
-                            {
-                                infos[i].mask = new FSprite("Futile_White", true)
-                                {
-                                    scaleX = game.rainWorld.options.ScreenSize.x / 16f,
-                                    scaleY = 48f,
-                                    anchorX = 0f,
-                                    anchorY = 0f,
-                                    color = maskColor.Value,
-                                    shader = game.rainWorld.Shaders["Basic"]
-                                };
-                                game.cameras[i].ReturnFContainer("Background").AddChild(infos[i].mask);
-                                game.cameras[i].ReturnFContainer("Foreground").isVisible = false;
-                            }
-                        }
-                        curRoom = game.cameras[0].room;
+                        ActivateMask();
                     }
                     else
                     {
-                        Logger.LogMessage($"GreyScreen) Revert Mask (fgRemoval: {(fgRemoval.Value ? "O" : "X")})");
-                        for (int i = 0; i < game.cameras.Length; i++)
-                        {
-                            if (infos[i].pOrig.texture != infos[i].tOrig)
-                            {
-                                game.cameras[i].currentPalette = new RoomPalette(infos[i].tOrig, 1f - infos[i].tOrig.GetPixel(9, 7).r, 1f - infos[i].tOrig.GetPixel(30, 7).r,
-                                    infos[i].tOrig.GetPixel(2, 7), infos[i].tOrig.GetPixel(4, 7), infos[i].tOrig.GetPixel(5, 7), infos[i].tOrig.GetPixel(6, 7),
-                                    infos[i].tOrig.GetPixel(7, 7), infos[i].tOrig.GetPixel(8, 7), infos[i].tOrig.GetPixel(1, 7), infos[i].tOrig.GetPixel(0, 7),
-                                    infos[i].tOrig.GetPixel(10, 7), infos[i].tOrig.GetPixel(11, 7), infos[i].tOrig.GetPixel(12, 7), infos[i].tOrig.GetPixel(13, 7));
-                            }
-                            else
-                            { game.cameras[i].currentPalette = CameraInfo.ClonePalette(infos[i].pOrig); }
-                            typeof(RoomCamera).GetField("paletteTexture", flags).SetValue(game.cameras[i], infos[i].tOrig);
-                            game.cameras[i].ReturnFContainer("BackgroundShortcuts").isVisible = true;
-
-                            if (fgRemoval.Value)
-                            {
-                                infos[i].mask.RemoveFromContainer();
-                                game.cameras[i].ReturnFContainer("Foreground").isVisible = true;
-                            }
-                        }
-                        infos = null;
+                        DeactivateMask();
                     }
                 }
                 keyDown = false;
                 hold = 0;
+            }
+
+            void ActivateMask()
+            {
+                Logger.LogMessage($"Apply Mask (removeFG: {(fgRemoval.Value ? "O" : "X")})");
+                infos = new CameraInfo[game.cameras.Length];
+                for (int i = 0; i < game.cameras.Length; i++)
+                {
+                    infos[i] = new CameraInfo(game.cameras[i], (Texture2D)typeof(RoomCamera).GetField("paletteTexture", flags).GetValue(game.cameras[i]));
+                    if (infos[i] == null) continue;
+                    game.cameras[i].currentPalette = CameraInfo.ClonePalette(infos[i].pGrey);
+                    typeof(RoomCamera).GetField("paletteTexture", flags).SetValue(game.cameras[i], infos[i].pGrey.texture);
+                    game.cameras[i].ReturnFContainer("BackgroundShortcuts").isVisible = false;
+
+                    if (fgRemoval.Value)
+                    {
+                        infos[i].mask = new FSprite("Futile_White", true)
+                        {
+                            scaleX = game.rainWorld.options.ScreenSize.x / 16f,
+                            scaleY = 48f,
+                            anchorX = 0f,
+                            anchorY = 0f,
+                            color = maskColor.Value,
+                            shader = game.rainWorld.Shaders["Basic"]
+                        };
+                        game.cameras[i].ReturnFContainer("Background").AddChild(infos[i].mask);
+                        game.cameras[i].ReturnFContainer("Foreground").isVisible = false;
+                    }
+                }
+                curRoom = game.cameras[0].room;
+            }
+
+            void DeactivateMask()
+            {
+                Logger.LogMessage($"GreyScreen) Revert Mask (fgRemoval: {(fgRemoval.Value ? "O" : "X")})");
+                for (int i = 0; i < game.cameras.Length; i++)
+                {
+                    if (infos[i].pOrig.texture != infos[i].tOrig)
+                    {
+                        game.cameras[i].currentPalette = new RoomPalette(infos[i].tOrig, 1f - infos[i].tOrig.GetPixel(9, 7).r, 1f - infos[i].tOrig.GetPixel(30, 7).r,
+                            infos[i].tOrig.GetPixel(2, 7), infos[i].tOrig.GetPixel(4, 7), infos[i].tOrig.GetPixel(5, 7), infos[i].tOrig.GetPixel(6, 7),
+                            infos[i].tOrig.GetPixel(7, 7), infos[i].tOrig.GetPixel(8, 7), infos[i].tOrig.GetPixel(1, 7), infos[i].tOrig.GetPixel(0, 7),
+                            infos[i].tOrig.GetPixel(10, 7), infos[i].tOrig.GetPixel(11, 7), infos[i].tOrig.GetPixel(12, 7), infos[i].tOrig.GetPixel(13, 7));
+                    }
+                    else
+                    { game.cameras[i].currentPalette = CameraInfo.ClonePalette(infos[i].pOrig); }
+                    typeof(RoomCamera).GetField("paletteTexture", flags).SetValue(game.cameras[i], infos[i].tOrig);
+                    game.cameras[i].ReturnFContainer("BackgroundShortcuts").isVisible = true;
+
+                    if (fgRemoval.Value)
+                    {
+                        infos[i].mask.RemoveFromContainer();
+                        game.cameras[i].ReturnFContainer("Foreground").isVisible = true;
+                    }
+                }
+                infos = null;
             }
         }
 

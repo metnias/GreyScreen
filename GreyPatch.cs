@@ -7,7 +7,7 @@ namespace GreyScreen
         public static void Patch()
         {
             ColorMagic.GenerateColorUV();
-            On.CustomDecal.DrawSprites += DecalPatch;
+            //On.CustomDecal.DrawSprites += DecalPatch;
             On.Water.DrawSprites += WaterPatch;
             On.RoomCamera.ApplyFade += CameraFadePatch;
             On.RainWorldGame.ExitGame += ExitGamePatch;
@@ -70,6 +70,12 @@ namespace GreyScreen
             else
             {
                 orig(self, timeStacker, timeSpeed);
+            }
+            if (GreyPlugin.mask)
+            {
+                Shader.DisableKeyword("RoomHasDeathFall");
+                if (self.fullScreenEffect != null)
+                    self.fullScreenEffect.alpha = 0f;
             }
         }
     }
